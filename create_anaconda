@@ -1,0 +1,51 @@
+Anaconda是一个开源的Python发行版本，可以帮助我们更方便地配置Python环境。
+如果只需要某些包，或者需要节省带宽或存储空间，也可以使用Miniconda这个较小的发行版
+
+更新系统软件包
+yum update -y
+
+安装软件管理包和可能使用的依赖
+yum -y groupinstall "Development tools"
+yum install openssl-devel bzip2-devel expat-devel gdbm-devel readline-devel sqlite-devel
+
+1. 下载Anaconda3
+wget https://repo.anaconda.com/archive/Anaconda3-2019.03-Linux-x86_64.sh
+anaconda 网址：https://www.anaconda.com/distribution/
+可以去查看最新版本的下载地址
+
+2. 安装
+bash Anaconda3-2019.03-Linux-x86_64.sh
+一直 enter 和 yes （安装包时提前输入一个yes，可以直接初始化）
+
+手动初始化
+如果没有直接初始化，就需要手动安装 自动初始化成功就不需要
+通过
+
+vim /root/.bashrc
+将以下内容添加到 /root/.bashrc
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/Anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/Anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/opt/Anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/Anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+3. 使环境生效
+source ~/.bashrc
+
+4. 完成
+检验 Python 版本
+
+python
+检验 pip 版本
+
+pip -V
