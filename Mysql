@@ -1,0 +1,43 @@
+Centos7下安装MySQL5.7
+
+在home目录下创建data目录作为默认路径
+[root@localhost /]# mkdir /home/data
+[root@localhost /]# cd /home/data/
+[root@localhost data]#
+
+关掉MySQL的服务进程（需要输入密码）
+[root@localhost data]# mysqladmin -u root -p shutdown
+Enter password:
+
+把/var/lib/mysql整个目录移到/home/data下
+[root@localhost data]# mv /var/lib/mysql /home/data/
+[root@localhost data]# 
+或者
+[root@localhost data]# cp -R /var/lib/mysql /home/data/
+[root@localhost data]# 
+
+设置/home/data/下mysql文件夹的主属和权限
+[root@localhost data]# chown -R mysql:mysql /home/data/mysql
+[root@localhost data]# ll
+总用量 0
+drwxr-x--x 6 mysql mysql 328 10月 22 18:36 mysql
+[root@localhost data]# 
+
+修改配置文件/etc/my.cnf
+[root@localhost data]# vim /etc/my.cnf
+
+按照下边的内容修改参数
+
+[mysqld]
+#datadir=/var/lib/mysql
+datadir=/home/data/mysql
+#socket=/var/lib/mysql/mysql.sock
+socket=/home/data/mysql/mysql.sock
+
+[client]
+default-character-set=utf8
+socket=/home/data/mysql/mysql.sock
+
+[mysql]
+default-character-set=utf8
+socket=/home/data/mysql/mysql.sock
