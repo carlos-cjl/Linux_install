@@ -29,8 +29,10 @@ redis启动成功，但是这种启动方式需要一直打开窗口，不能进
 2、以后台进程方式启动redis
 第一步：修改redis.conf文件
 将daemonize no 修改为 daemonize yes
+
 第二步：指定redis.conf文件启动
 ./redis-server /usr/local/redis-4.0.6/redis.conf
+
 第三步：关闭redis进程
 首先使用ps -aux | grep redis查看redis进程
 [root@iZwz991stxdwj560bfmadtZ src]# ps -aux | grep redis
@@ -39,19 +41,18 @@ root     18719  0.0  0.0 112644   968 pts/0    R+   13:09   0:00 grep --color=au
 使用kill命令杀死进程
 kill 18714
 　 
-
 3、设置redis开机自启动
-1、在/etc目录下新建redis目录
+(1)、在/etc目录下新建redis目录
 mkdir redis
 
-2、将/usr/local/redis-4.0.6/redis.conf 文件复制一份到/etc/redis目录下，并命名为6379.conf　　
+(2)、将/usr/local/redis-4.0.6/redis.conf 文件复制一份到/etc/redis目录下，并命名为6379.conf　　
 cp /安装地址/redis-4.0.6/redis.conf /etc/redis/6379.conf
 
-3、将redis的启动脚本复制一份放到/etc/init.d目录下
+(3)、将redis的启动脚本复制一份放到/etc/init.d目录下
 cp /安装地址/redis-4.0.6/utils/redis_init_script /etc/init.d/redisd
  
 
-4、设置redis开机自启动
+(4)、设置redis开机自启动
 先切换到/etc/init.d目录下，然后执行自启命令
 chkconfig redisd on
 
