@@ -1,4 +1,5 @@
 centos下安装nodejs的三种种方式：
+
 方法一：源码包安装
 
 官网下载 centos下载最新版10.9 https://nodejs.org/dist/v10.9.0/node-v10.9.0-linux-x64.tar.xz
@@ -25,11 +26,9 @@ v10.9.0
 方法二：nvm方式安装
 
 curl:
-
 $ curl https://raw.github.com/creationix/nvm/master/install.sh | sh
 
 wget：
-
 $ wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh
 
 安装完成后，执行下列命令即可安装 Node.js。
