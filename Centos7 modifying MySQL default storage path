@@ -1,0 +1,112 @@
+Centos7下安装MySQL5.7
+
+在home目录下创建data目录作为默认路径
+
+[root@localhost /]# mkdir /home/data
+[root@localhost /]# cd /home/data/
+[root@localhost data]#
+1
+2
+3
+关掉MySQL的服务进程（需要输入密码）
+
+[root@localhost data]# mysqladmin -u root -p shutdown
+Enter password:
+1
+2
+把/var/lib/mysql整个目录移到/home/data下
+
+[root@localhost data]# mv /var/lib/mysql /home/data/
+[root@localhost data]# 
+1
+2
+或者
+
+[root@localhost data]# cp -R /var/lib/mysql /home/data/
+[root@localhost data]# 
+1
+2
+设置/home/data/下mysql文件夹的主属和权限
+
+[root@localhost data]# chown -R mysql:mysql /home/data/mysql
+[root@localhost data]# ll
+总用量 0
+drwxr-x--x 6 mysql mysql 328 10月 22 18:36 mysql
+[root@localhost data]# 
+1
+2
+3
+4
+5
+修改配置文件/etc/my.cnf
+
+[root@localhost data]# vim /etc/my.cnf
+1
+按照下边的内容修改参数
+
+[mysqld]
+#datadir=/var/lib/mysql
+datadir=/home/data/mysql
+#socket=/var/lib/mysql/mysql.sock
+socket=/home/data/mysql/mysql.sock
+
+[client]
+default-character-set=utf8
+socket=/home/data/mysql/mysql.sock
+
+[mysql]
+default-character-set=utf8
+socket=/home/data/mysql/mysql.sock
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+
+
+SELINUX 设置
+
+[root@localhost data]# vim /etc/selinux/config
+1
+把SELINUX的参数修改成disabled即可：
+
+
+重新启动MySQL服务（只需输入下边的启动命令即可）
+
+systemctl restart mysqld.service  #重启
+systemctl start mysqld.service  #启动
+systemctl stop mysqld.service #停止
+service mysqld status #查看状态
+1
+2
+3
+4
+登录测试一下
+
+[root@localhost data]# mysql -uroot -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 3
+Server version: 5.7.28 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2019, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+
+————————————————
+版权声明：本文为CSDN博主「程序猿杂记」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/weixin_44110998/article/details/102687900
