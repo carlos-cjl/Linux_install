@@ -53,3 +53,13 @@ EOF
 $ yum install -y kubelet-1.18.0 kubeadm-1.18.0 kubectl-1.18.0（在官网自行查看最新稳定版本）
 $ systemctl enable kubelet
  
+3.部署Kubernetes Master：
+在192.168.1.135 k8s-master上运行代码（master主机	）
+运行前开机启动 systemctl enable kubelet.service
+
+$ kubeadm init \
+--apiserver-advertise-address=192.168.1.135 \
+--image-repository registry.aliyun.com/google_containers \
+--kubernetes-version v1.15.0 \
+--service-cidr=10.1.0.0/16 \ 	# kube-proxy 的ip
+--pod-network-cidr=10.244.0.0/16     #容器ip
