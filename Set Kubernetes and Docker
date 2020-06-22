@@ -64,3 +64,9 @@ $ kubeadm init \
 --service-cidr=10.1.0.0/16 \ 	# kube-proxy 的ip
 --pod-network-cidr=10.244.0.0/16     #容器ip
 拉取镜像失败的可能原因：国外的网址无法访问，所以用国内镜像(阿里云)，或者是时间不对，更新时间(ntpdate time.windows.com)
+
+增加配置文件，连接集群
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
