@@ -71,4 +71,4 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 $ kubectl get nodes
-输入后，看见Master节点信息，显示未准备好，因为需要等待网络加入 
+输入后，看见Master节点信息，显示未准备好，因为需要等待网络加入
