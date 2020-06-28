@@ -1,0 +1,41 @@
+一、前置知识点
+1.1 生产环境可部署Kubernetes集群的两种方式
+目前生产部署Kubernetes集群主要有两种方式：
+kubeadm
+Kubeadm是一个K8s部署工具，提供kubeadm init和kubeadm join，用于快速部署Kubernetes集群。
+官方地址：https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/
+二进制包
+从github下载发行版的二进制包，手动部署每个组件，组成Kubernetes集群。
+Kubeadm降低部署门槛，但屏蔽了很多细节，遇到问题很难排查。如果想更容易可控，推荐使用二进制包部署Kubernetes集群，虽然手动部署麻烦点，期间可以学习很多工作原理，也利于后期维护。
+
+1.2 安装要求
+在开始之前，部署Kubernetes集群机器需要满足以下几个条件：
+一台或多台机器，操作系统 CentOS7.x-86_x64
+硬件配置：2GB或更多RAM，2个CPU或更多CPU，硬盘30GB或更多
+集群中所有机器之间网络互通
+可以访问外网，需要拉取镜像，如果服务器不能上网，需要提前下载镜像并导入节点
+禁止swap分区
+
+1.3 准备环境
+软件环境：
+软件	版本
+操作系统	CentOS7.8_x64 （mini）
+Docker	19-ce
+Kubernetes	1.18
+服务器整体规划：
+角色	IP	组件
+k8s-master1	192.168.31.71	kube-apiserver，kube-controller-manager，kube-scheduler，etcd
+k8s-master2	192.168.31.74	kube-apiserver，kube-controller-manager，kube-scheduler
+k8s-node1	192.168.31.72	kubelet，kube-proxy，docker etcd
+k8s-node2	192.168.31.73	kubelet，kube-proxy，docker，etcd
+Load Balancer（Master）	192.168.31.81 ，192.168.31.88 (VIP)	Nginx L4
+Load Balancer（Backup）	192.168.31. 82	Nginx L4
+
+须知：考虑到有些朋友电脑配置较低，这么多虚拟机跑不动，所以这一套高可用集群分两部分实施，先部署一套单Master架构（192.168.31.71/72/73），再扩容为多Master架构（上述规划），顺便熟悉下Master扩容流程。
+单Master架构图：
+
+单Master服务器规划：
+角色	IP	组件
+k8s-master	192.168.31.71	kube-apiserver，kube-controller-manager，kube-scheduler，etcd
+k8s-node1	192.168.31.72	kubelet，kube-proxy，docker etcd
+k8s-node2	192.168.31.73	kubelet，kube-proxy，docker，etcd
