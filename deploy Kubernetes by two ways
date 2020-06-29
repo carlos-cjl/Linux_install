@@ -73,3 +73,71 @@ sysctl --system  # 生效
 # 时间同步
 yum install ntpdate -y
 ntpdate time.windows.com
+
+二、部署Etcd集群
+Etcd 是一个分布式键值存储系统，Kubernetes使用Etcd进行数据存储，所以先准备一个Etcd数据库，为解决Etcd单点故障，应采用集群方式部署，这里使用3台组建集群，可容忍1台机器故障，当然，你也可以使用5台组建集群，可容忍2台机器故障。
+节点名称	IP
+etcd-1	192.168.31.71
+etcd-2	192.168.31.72
+etcd-3	192.168.31.73
+注：为了节省机器，这里与K8s节点机器复用。也可以独立于k8s集群之外部署，只要apiserver能连接到就行。
+
+2.1 准备cfssl证书生成工具
+cfssl是一个开源的证书管理工具，使用json文件生成证书，相比openssl更方便使用。
+找任意一台服务器操作，这里用Master节点。
+wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+wget https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64
+chmod +x cfssl_linux-amd64 cfssljson_linux-amd64 cfssl-certinfo_linux-amd64
+mv cfssl_linux-amd64 /usr/local/bin/cfssl
+mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+mv cfssl-certinfo_linux-amd64 /usr/bin/cfssl-certinfo
+
+2.2 生成Etcd证书
+1. 自签证书颁发机构（CA）
+创建工作目录：
+mkdir -p ~/TLS/{etcd,k8s}
+
+cd TLS/etcd
+自签CA：
+cat > ca-config.json << EOF
+{
+  "signing": {
+    "default": {
+      "expiry": "87600h"
+    },
+    "profiles": {
+      "www": {
+         "expiry": "87600h",
+         "usages": [
+            "signing",
+            "key encipherment",
+            "server auth",
+            "client auth"
+        ]
+      }
+    }
+  }
+}
+EOF
+
+cat > ca-csr.json << EOF
+{
+    "CN": "etcd CA",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "C": "CN",
+            "L": "Beijing",
+            "ST": "Beijing"
+        }
+    ]
+}
+EOF
+生成证书：
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+
+ls *pem
