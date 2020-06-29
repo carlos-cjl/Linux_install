@@ -141,3 +141,4 @@ EOF
 cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
 
 ls *pem
+ca-key.pem  ca.pem
