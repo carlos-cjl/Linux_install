@@ -37,7 +37,7 @@ Load Balancer（Backup）	192.168.31. 82	Nginx L4
 单Master服务器规划：
 角色	IP	组件
 k8s-master	192.168.31.71	kube-apiserver，kube-controller-manager，kube-scheduler，etcd
-k8s-node1	192.168.31.72	kubelet，kube-proxy，docker etcd 
+k8s-node1	192.168.31.72	kubelet，kube-proxy，docker etcd
 k8s-node2	192.168.31.73	kubelet，kube-proxy，docker，etcd
 
 1.4 操作系统初始化配置
