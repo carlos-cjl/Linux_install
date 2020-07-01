@@ -185,3 +185,73 @@ ETCD_ADVERTISE_CLIENT_URLS：客户端通告地址
 ETCD_INITIAL_CLUSTER：集群节点地址
 ETCD_INITIAL_CLUSTER_TOKEN：集群Token
 ETCD_INITIAL_CLUSTER_STATE：加入集群的当前状态，new是新集群，existing表示加入已有集群
+
+3. systemd管理etcd
+cat > /usr/lib/systemd/system/etcd.service << EOF
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=notify
+EnvironmentFile=/opt/etcd/cfg/etcd.conf
+ExecStart=/opt/etcd/bin/etcd \
+--cert-file=/opt/etcd/ssl/server.pem \
+--key-file=/opt/etcd/ssl/server-key.pem \
+--peer-cert-file=/opt/etcd/ssl/server.pem \
+--peer-key-file=/opt/etcd/ssl/server-key.pem \
+--trusted-ca-file=/opt/etcd/ssl/ca.pem \
+--peer-trusted-ca-file=/opt/etcd/ssl/ca.pem \
+--logger=zap
+Restart=on-failure
+LimitNOFILE=65536
+[Install]
+WantedBy=multi-user.target
+EOF
+
+4. 拷贝刚才生成的证书
+把刚才生成的证书拷贝到配置文件中的路径：
+cp ~/TLS/etcd/ca*pem ~/TLS/etcd/server*pem /opt/etcd/ssl/
+
+5. 启动并设置开机启动
+systemctl daemon-reload
+systemctl start etcd
+systemctl enable etcd
+
+通过journalctl -u XXX 查看相关日志文件 
+journalctl -u etcd > a
+ps -ef |grep etcd
+
+5. 启动并设置开机启动
+systemctl daemon-reload
+systemctl start etcd
+systemctl enable etcd
+6. 将上面节点1所有生成的文件拷贝到节点2和节点3
+scp -r /opt/etcd/ root@192.168.1.141:/opt/
+scp /usr/lib/systemd/system/etcd.service root@192.168.1.141:/usr/lib/systemd/system/
+scp -r /opt/etcd/ root@192.168.1.143:/opt/
+scp /usr/lib/systemd/system/etcd.service root@192.168.1.143:/usr/lib/systemd/system/
+然后在节点2和节点3分别修改etcd.conf配置文件中的节点名称和当前服务器IP：
+
+vi /opt/etcd/cfg/etcd.conf
+#[Member]
+ETCD_NAME="etcd-1"   # 修改此处，节点2改为etcd-2，节点3改为etcd-3
+ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_LISTEN_PEER_URLS="https://192.168.1.135:2380"   # 修改此处为当前服务器IP
+ETCD_LISTEN_CLIENT_URLS="https://192.168.1.135:2379" # 修改此处为当前服务器IP
+#[Clustering]
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.1.135:2380" # 修改此处为当前服务器IP
+ETCD_ADVERTISE_CLIENT_URLS="https://192.168.1.135:2379" # 修改此处为当前服务器IP
+ETCD_INITIAL_CLUSTER="etcd-1=https://192.168.1.135:2380,etcd-2=https://192.168.1.141:2380,etcd-3=https://192.168.1.143:2380"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_INITIAL_CLUSTER_STATE="new"
+最后启动etcd并设置开机启动，同上。
+
+7. 查看集群状态
+ETCDCTL_API=3 /opt/etcd/bin/etcdctl --cacert=/opt/etcd/ssl/ca.pem --cert=/opt/etcd/ssl/server.pem --key=/opt/etcd/ssl/server-key.pem --endpoints="https://192.168.1.135:2379,https://192.168.1.141:2379,https://192.168.1.143:2379" endpoint health
+
+https://192.168.1.135:2379 is healthy: successfully committed proposal: took = 8.154404ms
+https://192.168.1.141:2379 is healthy: successfully committed proposal: took = 9.044117ms
+https://192.168.1.143:2379 is healthy: successfully committed proposal: took = 10.000825ms
+
