@@ -3,13 +3,185 @@
 目前生产部署Kubernetes集群主要有两种方式：
 
 kubeadm
-
 Kubeadm是一个K8s部署工具，提供kubeadm init和kubeadm join，用于快速部署Kubernetes集群。
-
 官方地址：https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/
 
 二进制包
-
 从github下载发行版的二进制包，手动部署每个组件，组成Kubernetes集群。
-
 Kubeadm降低部署门槛，但屏蔽了很多细节，遇到问题很难排查。如果想更容易可控，推荐使用二进制包部署Kubernetes集群，虽然手动部署麻烦点，期间可以学习很多工作原理，也利于后期维护。
+部署步骤：
+1.将二进制包上传到服务器并解压指定安装目录
+2.添加给二进制程序准备配置文件
+3.systemctl start/enable XXX
+
+1.4 操作系统初始化配置
+# 关闭防火墙
+systemctl stop firewalld
+systemctl disable firewalld
+
+# 关闭selinux
+sed -i 's/enforcing/disabled/' /etc/selinux/config  # 永久
+setenforce 0  # 临时
+
+# 关闭swap
+swapoff -a  # 临时
+sed -ri 's/.*swap.*/#&/' /etc/fstab    # 永久
+
+# 根据规划设置主机名
+hostnamectl set-hostname <hostname>
+# 更新
+bash
+
+# 在master添加hosts
+cat >> /etc/hosts << EOF
+192.168.1.135 k8s-master
+192.168.1.141 k8s-node1
+192.168.1.143 k8s-node2
+EOF
+
+# 将桥接的IPv4流量传递到iptables的链
+cat > /etc/sysctl.d/k8s.conf << EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sysctl --system  # 生效
+
+# 时间同步
+yum install ntpdate -y
+ntpdate time.windows.com
+
+二、部署Etcd集群
+Etcd 是一个分布式键值存储系统，Kubernetes使用Etcd进行数据存储，所以先准备一个Etcd数据库，
+为解决Etcd单点故障，应采用集群方式部署，这里使用3台组建集群，可容忍1台机器故障，当然，你也可以使用5台组建集群，可容忍2台机器故障。
+
+注：为了节省机器，这里与K8s节点机器复用。也可以独立于k8s集群之外部署，只要apiserver能连接到就行。
+
+2.1 准备cfssl证书生成工具
+cfssl是一个开源的证书管理工具，使用json文件生成证书，相比openssl更方便使用。
+
+找任意一台服务器操作，这里用Master节点。
+wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+wget https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64
+chmod +x cfssl_linux-amd64 cfssljson_linux-amd64 cfssl-certinfo_linux-amd64
+mv cfssl_linux-amd64 /usr/local/bin/cfssl
+mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+mv cfssl-certinfo_linux-amd64 /usr/bin/cfssl-certinfo
+
+2.2 生成Etcd证书
+1. 自签证书颁发机构（CA）
+创建工作目录：
+mkdir -p ~/TLS/{etcd,k8s}
+
+cd TLS/etcd
+自签CA：
+cat > ca-config.json << EOF
+{
+  "signing": {
+    "default": {
+      "expiry": "87600h"
+    },
+    "profiles": {
+      "www": {
+         "expiry": "87600h",
+         "usages": [
+            "signing",
+            "key encipherment",
+            "server auth",
+            "client auth"
+        ]
+      }
+    }
+  }
+}
+EOF
+
+cat > ca-csr.json << EOF
+{
+    "CN": "etcd CA",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "C": "CN",
+            "L": "Beijing",
+            "ST": "Beijing"
+        }
+    ]
+}
+EOF
+生成证书：
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+
+ls *pem
+ca-key.pem  ca.pem
+
+2. 使用自签CA签发Etcd HTTPS证书
+创建证书申请文件：
+cat > server-csr.json << EOF
+{
+    "CN": "etcd",
+    "hosts": [
+    "192.168.1.135",
+    "192.168.1.141",
+    "192.168.1.143"
+    ],
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "C": "CN",
+            "L": "BeiJing",
+            "ST": "BeiJing"
+        }
+    ]
+}
+EOF
+
+注：上述文件hosts字段中IP为所有etcd节点的集群内部通信IP，一个都不能少！为了方便后期扩容可以多写几个预留的IP。
+
+生成证书：
+cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=www server-csr.json | cfssljson -bare server
+
+ls server*pem
+server-key.pem  server.pem
+
+2.3 从Github下载二进制文件
+下载地址：https://github.com/etcd-io/etcd/releases/download/v3.4.9/etcd-v3.4.9-linux-amd64.tar.gz
+
+2.4 部署Etcd集群
+以下在节点1上操作，为简化操作，待会将节点1生成的所有文件拷贝到节点2和节点3.
+
+1. 创建工作目录并解压二进制包  bin二进制文件，cfg配置文件，ssl证书
+mkdir /opt/etcd/{bin,cfg,ssl} -p
+tar zxvf etcd-v3.4.9-linux-amd64.tar.gz
+mv etcd-v3.4.9-linux-amd64/{etcd,etcdctl} /opt/etcd/bin/
+
+2. 创建etcd配置文件
+cat > /opt/etcd/cfg/etcd.conf << EOF
+#[Member]
+ETCD_NAME="etcd-1"
+ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_LISTEN_PEER_URLS="https://192.168.1.135:2380"
+ETCD_LISTEN_CLIENT_URLS="https://192.168.1.135:2379"
+#[Clustering]
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.1.135:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://192.168.1.135:2379"
+ETCD_INITIAL_CLUSTER="etcd-1=https://192.168.1.135:2380,etcd-2=https://192.168.1.141:2380,etcd-3=https://192.168.1.143:2380"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_INITIAL_CLUSTER_STATE="new"
+EOF
+
+ETCD_NAME：节点名称，集群中唯一
+ETCD_DATA_DIR：数据目录
+ETCD_LISTEN_PEER_URLS：集群通信监听地址
+ETCD_LISTEN_CLIENT_URLS：客户端访问监听地址
+ETCD_INITIAL_ADVERTISE_PEER_URLS：集群通告地址
+ETCD_ADVERTISE_CLIENT_URLS：客户端通告地址
+ETCD_INITIAL_CLUSTER：集群节点地址
+ETCD_INITIAL_CLUSTER_TOKEN：集群Token
+ETCD_INITIAL_CLUSTER_STATE：加入集群的当前状态，new是新集群，existing表示加入已有集群
