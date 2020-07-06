@@ -2,7 +2,7 @@ https://kubernetes.io/ 官网
 快速部署一个Kubernetes集群
 1.准备环境：
 关闭防火墙：
-$  systemctl stop firewalld  阿萨
+$  systemctl stop firewalld
 $ systemctl disable firewalld
 
 关闭selinux：
