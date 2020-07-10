@@ -48,4 +48,4 @@ source ~/.bashrc
 python
 检验 pip 版本
 
-pip -V
+pip -V 
