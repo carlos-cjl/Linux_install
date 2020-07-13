@@ -84,3 +84,4 @@ location为代理接口，可以转发代理后端的请求接口域名或者ip�
 执行nginx -t，可以测试Nginx的配置是否正确。
 执行nginx，在配置文件正确的情况下即可启动nginx服务。
 修改nginx配置文件后执行nginx -s reload可以完成平滑过渡重新加载配置
+ 
