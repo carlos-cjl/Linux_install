@@ -34,3 +34,16 @@ docker run -d -p 主机端口号:项目端口号 镜像id
 查看镜像日志
 docker logs 容器id
  
+
+
+
+
+etherpad Dockerfile编写时可能遇到的问题：
+证书问题：
+RUN mkdir /opt/etherpad-lite/cert
+
+COPY ./cert /opt/etherpad-lite/cert
+
+需要将证书文件COPY到docker打包成镜像的地方，在此之前需要创建cert，和当前文件夹的cert并放入.key和.crt文件
+
+在settings.json.docker中将ca注释，并且写入证书路径，ip最好默认不变（ip:0.0.0.0）
