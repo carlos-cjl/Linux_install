@@ -33,3 +33,4 @@ docker run -d -p 主机端口号:项目端口号 镜像id
 
 查看镜像日志
 docker logs 容器id
+ 
