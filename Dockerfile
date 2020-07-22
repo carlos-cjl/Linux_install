@@ -1,4 +1,4 @@
- FROM : 指定基础镜像，要在哪个镜像建立，格式为 FROM <image> 或FROM <image>:<tag> ，第一条指令必须为 FROM 指令。
+FROM : 指定基础镜像，要在哪个镜像建立，格式为 FROM <image> 或FROM <image>:<tag> ，第一条指令必须为 FROM 指令。
 
 MAINTAINER：指定维护者信息，格式为 MAINTAINER <name>
 
