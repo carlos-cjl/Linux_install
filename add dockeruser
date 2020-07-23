@@ -1,0 +1,2 @@
+useradd -u XXXX -d /home/user -g root -G users user
+        uid=XXXX    指定家目录  加入root组，附加users组
