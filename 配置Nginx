@@ -85,3 +85,9 @@ location为代理接口，可以转发代理后端的请求接口域名或者ip�
 执行nginx，在配置文件正确的情况下即可启动nginx服务。
 修改nginx配置文件后执行nginx -s reload可以完成平滑过渡重新加载配置
  
+
+
+
+
+Nginx+Tomcat问题
+Tomcat的server.conf文件中需要配置将bind 127.0.0.1 修改成0.0.0.0方便跨域访问。
