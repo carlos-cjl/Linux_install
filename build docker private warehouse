@@ -48,9 +48,10 @@ registry:latest：这个是刚才pull下来的镜像；
 
 4、测试镜像仓库（测试端操作）
 4.1 修改下镜像源并重启docker服务
-[root@node ~]# vim /etc/docker/daemon.json
+[root@node ~]# vim /etc/docker/daemon.json 
 {
-  "registry-mirrors": [ "https://registry.docker-cn.com"]
+  "registry-mirrors": [ "https://registry.docker-cn.com"],
+  "insecure-registries": [ "192.168.1.143:5000"]
 }
 [root@node ~]# systemctl restart docker
 
@@ -64,32 +65,12 @@ busybox            latest              f6e427c148a7        36 hours ago        1
 [root@node ~]# docker tag busybox:latest  192.168.1.143:5000/busybox:v1
 格式说明：Usage: docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG] 
 busybox:lastest 这是源镜像，也是刚才pull下来的镜像文件；
-172.18.18.90:500/busybox:v1：这是目标镜像，也是registry私有镜像服务器的IP地址和端口；
+192.168.1.143:500/busybox:v1：这是目标镜像，也是registry私有镜像服务器的IP地址和端口；
 
 查看一下打好的tag
-
-
+docker images
 
 4.3 上传到镜像服务器
-
-[root@node ~]# docker push 172.18.18.90:5000/busybox:v1 
-The push refers to repository [172.18.18.90:5000/busybox]
-Get https://172.18.18.90:5000/v2/: http: server gave HTTP response to HTTPS client
-
-注意了，这是报错了，需要https的方法才能上传，我们可以修改下daemon.json来解决：
-
-[root@node ~]# vim /etc/docker/daemon.json 
-{
-  "registry-mirrors": [ "https://registry.docker-cn.com"],
-  "insecure-registries": [ "192.168.1.143:5000"]
-}
-
-添加私有镜像服务器的地址，注意书写格式为json，有严格的书写要求，然后重启docker服务：
-
-[root@node ~]# systemctl  restart docker
-
-在次上传可以看到没问题 了：
-
 [root@node ~]# docker push 192.168.1.143:5000/busybox:v1 
 The push refers to repository [192.168.1.143:5000/busybox]
 c5183829c43c: Pushed 
