@@ -18,4 +18,7 @@ EXPOSE ****
 #执行，XXXX为重命名的jar包
 ENTRYPOINT ["java","-jar","/xxxx.jar"]
 
-
+#编写好Dockerfile后，dockerfile和jar包最好放在同一路径下，XXXX是为images命名
+[root@master java]# docker build -t XXXX .
+[root@master java]# docker images
+[root@master java]# docker run -d -p 容器端口:镜像端口 镜像ID
