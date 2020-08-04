@@ -1,6 +1,7 @@
 # 基于JAVA8镜像
 FROM java:8
-#
+
+#添加jar包 更改名字
 #ADD interest-eureka-0.0.1-SNAPSHOT.jar app.jar
 #ADD interest-zuul-0.0.1-SNAPSHOT.jar zuul.jar
 #ADD interest-user-0.0.1-SNAPSHOT.jar user.jar
@@ -10,5 +11,11 @@ FROM java:8
 #ADD interest-payment-0.0.1-SNAPSHOT.jar payment.jar
 #ADD interest-riskCopy-1.0.0.jar riskCopy.jar
 #ADD interest-template-0.0.1-SNAPSHOT.jar template.jar
-EXPOSE ****   # 端口号
-ENTRYPOINT ["java","-jar","/xxxx.jar"]  # XXXX 
+
+#放开端口号
+EXPOSE ****
+
+#执行，XXXX为重命名的jar包
+ENTRYPOINT ["java","-jar","/xxxx.jar"]
+
+
