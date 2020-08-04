@@ -1,0 +1,14 @@
+# 基于JAVA8镜像
+FROM java:8
+#
+#ADD interest-eureka-0.0.1-SNAPSHOT.jar app.jar
+#ADD interest-zuul-0.0.1-SNAPSHOT.jar zuul.jar
+#ADD interest-user-0.0.1-SNAPSHOT.jar user.jar
+#ADD interest-approval-0.0.1-SNAPSHOT.jar approval.jar
+#ADD interest-file-0.0.1-SNAPSHOT.jar file.jar
+#ADD interest-meeting-0.0.1-SNAPSHOT.jar meeting.jar
+#ADD interest-payment-0.0.1-SNAPSHOT.jar payment.jar
+#ADD interest-riskCopy-1.0.0.jar riskCopy.jar
+#ADD interest-template-0.0.1-SNAPSHOT.jar template.jar
+EXPOSE ****   # 端口号
+ENTRYPOINT ["java","-jar","/xxxx.jar"]  # XXXX 
