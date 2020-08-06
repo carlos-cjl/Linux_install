@@ -52,3 +52,4 @@ yum install -y nodejs
 v10.9.0
 [root@localhost /]# npm -v
 6.2.0
+ 
