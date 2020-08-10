@@ -102,7 +102,7 @@ Status: Downloaded newer image for 192.168.1.143:5000/busybox:v1
 [root@node ~]# docker images
 REPOSITORY                  TAG                IMAGE ID            CREATED            SIZE
 172.18.18.90:5000/busybox  v1                  f6e427c148a7        36 hours ago        1.15MB
-
+ 
 列出所有镜像：
 
 [root@node ~]# curl  http://192.168.1.143:5000/v2/_catalog
