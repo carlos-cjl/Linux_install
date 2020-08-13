@@ -112,4 +112,4 @@ REPOSITORY                  TAG                IMAGE ID            CREATED      
 
 [root@node ~]# curl  http://192.168.1.143:5000/v2/busybox/tags/list
 {"name":"busybox","tags":["v1"]}
- 
+
