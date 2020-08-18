@@ -1,3 +1,35 @@
+LibreOffice 中文包
+https://downloadarchive.documentfoundation.org/libreoffice/old/6.4.6.2/rpm/
+
+下载:
+访问 https://www.libreoffice.org/download/download/
+选择 Linux x86_64(rpm) 的版本
+下载得到 LibreOffice_6.0.5_Linux_x86-64_rpm.tar.gz (目前最新版为 6.0.5)
+
+安装:
+删除: 在安装之前，先删除已经安装的 LibreOffice: yum remove libreoffice*
+解压: tar -xvf LibreOffice_6.0.5_Linux_x86-64_rpm.tar.gz
+
+安装:
+cd LibreOffice_6.0.5.2_Linux_x86-64_rpm/RPMS
+yum localinstall *.rpm
+
+查看:
+which libreoffice6.0 看到路径为 /usr/bin/libreoffice6.x
+ll /usr/bin/libreoffice6.x 得到 /opt/libreoffice6.0/program/soffice，说明安装到了 /opt/libreoffice6.0
+依赖:
+
+执行 libreoffice6.0 可能会提示库文件找不到，如 libcairo.so.2，libcups.so.2，libSM.so.6 等，执行下面几条命令安装需要的库:
+
+yum install cairo -y
+yum install cups-libs -y
+yum install libSM -y
+ 
+
+原理就是上边的，具体细节就是参考其他两个链接就可以了，主要的问题就是  必须使用yum安装，因为会有一些依赖。然后是各个压塑包里的RMPS中都需要。
+还有就是如果转换的有中文乱码  可以参考把windows中的字体复制到linux里就可以了 C:\Windows\Fonts  ---->   /usr/share/fonts/Fonts
+
+
 一、查看操作系统是否中文字体
 fc-list
 
