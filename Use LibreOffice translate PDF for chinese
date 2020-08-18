@@ -1,0 +1,22 @@
+一、查看操作系统是否中文字体
+fc-list
+
+若出现command not find
+1.终端输入：yum -y install cups-libs fontconfig
+2.成功后，在/usr/share目录就可以看到fonts和fontconfig目录了（之前是没有的）
+
+二、添加中文字体
+1.在CentOS中，字体库的存放位置正是上图中看到的fonts目录，所以我们首先要做的就是找到中文字体文件放到该目录下，而中文字体文件在我们的windows系统中就可以找到，打开c盘下的Windows/Fonts目录： 
+
+把中文字体文件上传到/usr/share/fonts
+2.在这之前我们还需要新建目录，首先在/usr/share/fonts目录下新建一个目录chinese：
+然后就是将上面的两个字体上传至/usr/share/fonts/chinese目录下即可
+3.chmod -R 755 /usr/share/fonts/chinese
+4.yum -y install ttmkfdir
+5.然后执行ttmkfdir命令即可：ttmkfdir -e /usr/share/X11/fonts/encodings/encodings.dir
+6.vi /etc/fonts/fonts.conf
+7.可以看到一个Font list，即字体列表，在这里需要把我们添加的中文字体位置加进去： 
+<dir>/usr/share/fonts/chinses</dir>
+8.刷新内存中的字体缓存，这样就不用reboot重启了，输入：fc-cache
+9.这样所有的步骤就算完成了，最后再次通过fc-list看一下字体列表：
+出现中文字样表示添加成功
