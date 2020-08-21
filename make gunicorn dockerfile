@@ -14,5 +14,7 @@ EXPOSE 8383
 
 # 容器启动时执行指令
 RUN chmod +x /app/run.sh
-CMD [ "/app/run.sh" ]
+
+#使用绝对路径
+CMD [ "/app/run.sh" ] 
 #CMD  ['gunicorn', '-c', 'gunicorn_config.py', 'run:app']   #run.sh写入执行命令
