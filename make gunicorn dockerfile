@@ -1,0 +1,18 @@
+#设置基础镜像
+FROM python:3.6
+
+#设置工作目录
+WORKDIR /app
+
+#将内容复制到容器
+COPY . /app
+
+RUN pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/   --trusted-host mirrors.aliyun.com
+
+#设置端口
+EXPOSE 8383
+
+# 容器启动时执行指令
+RUN chmod +x /app/run.sh
+CMD [ "/app/run.sh" ]
+#CMD  ['gunicorn', '-c', 'gunicorn_config.py', 'run:app']   #run.sh写入执行命令
