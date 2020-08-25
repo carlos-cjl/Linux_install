@@ -21,7 +21,7 @@ wget -c https://nginx.org/download/nginx-1.12.0.tar.gz
 tar -zxvf nginx-1.12.0.tar.gz
 cd nginx-1.12.0
 
-./configure --with-http_stub_status_module --with-http_ssl_module # 其中 --with-http_ssl_module 就是ssl模块
+./configure --with-http_stub_status_module --with-http_ssl_module # 其中 --with-http_ssl_module 就是ssl模块，不使用模块则用./configure
 
 编译安装
 make
