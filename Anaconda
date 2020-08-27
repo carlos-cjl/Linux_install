@@ -1,4 +1,4 @@
-Anaconda是一个开源的Python发行版本，可以帮助我们更方便地配置Python环境。 
+Anaconda是一个开源的Python发行版本，可以帮助我们更方便地配置Python环境。
 如果只需要某些包，或者需要节省带宽或存储空间，也可以使用Miniconda这个较小的发行版
 
 更新系统软件包
