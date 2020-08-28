@@ -8,7 +8,7 @@ https://downloadarchive.documentfoundation.org/libreoffice/old/6.4.6.2/rpm/
 
 安装:
 删除: 在安装之前，先删除已经安装的 LibreOffice: yum remove libreoffice*
-解压: tar -xvf LibreOffice_6.0.5_Linux_x86-64_rpm.tar.gz
+解压: tar -zxvf LibreOffice_6.0.5_Linux_x86-64_rpm.tar.gz
 
 安装:
 cd LibreOffice_6.0.5.2_Linux_x86-64_rpm/RPMS
