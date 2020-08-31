@@ -33,7 +33,7 @@ pm2 stop all            // 停止所有
 pm2 restart app.js      // 重启
 pm2 restart all         // 重启所有
 pm2 delete  app.js      // 关闭
-三、nodejs 自带node.js自带服务nohub，不需要安装别的包。
-缺点：存在无法查询日志等问题,关闭终端后服务也就关闭了， 经测试是这样的。
 
+三、nodejs 自带node.js自带服务nohub，不需要安装别的包。
+缺点：存在无法查询日志等问题,关闭终端后服务也就关闭了， 经测试是这样的。!!!!
 nohup node ***.js &
