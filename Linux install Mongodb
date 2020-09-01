@@ -1,3 +1,4 @@
+一 安装mongodb
 1、获取资源
 访问官网https://www.mongodb.com/try/download/community下载
 或直接wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-4.4.0.tgz
@@ -30,4 +31,86 @@ bind_ip=0.0.0.0 #这里默认是127.0.0.1, 设置成0.0.0.0是表示所有IP地�
 这一步可以在启动mongodb服务前配置好，   ./mongod -f ../mongodb.conf  指定这个配置文件启动
 
 后台启动成功除非手动关掉mongo服务或者关机等意外，否则mongo服务一直是开启状态，关闭mongodb服务的方法：  bin下执行./mongo进入shell 执行db.shutdownServer();
+
+
+
+二 mongoDB Linux 认证配置、重置密码、远程登录配置详解：
+
+1.启用、关闭认证
+vi /etc/mongod.conf
+
+//注释这两句 => 关闭认证
+#security:
+# authorization: enabled
+
+//打开这两句 => 启用认证
+security:
+ authorization: enabled
+
+2.远程、本地登录
+vi /etc/mongdo.conf
+bindIp 127.0.0.1 => 直接mongo --port 27017 -u [USERNAME] -p [PASSWORD] ... 可进入mongo shell
+bindIp 192.168.130.10p => 需要加--host mongo --port 27017 -u [USERNAME] -p [PASSWORD] --host 192.168.130.109 ..
+
+3.创建用户
+a.系统管理员：
+db.createUser(
+{
+    user: "jyjinAdmin",
+    pwd: "123456",
+    roles: [
+              { role: "userAdminAnyDatabase", db: "admin" },
+              { role: "readWriteAnyDatabase", db: "admin" },
+              { role: "dbAdminAnyDatabase", db: "admin" },
+              { role: "clusterAdmin", db: "admin" }
+           ]
+})
+
+db.createUser({user: "jyjinAdmin", pwd: "123456", roles: [{ role: "userAdminAnyDatabase", db: "admin" },{ role: "readWriteAnyDatabase", db: "admin" },{ role: "dbAdminAnyDatabase", db: "admin" },{ role: "clusterAdmin", db: "admin" }]})
+
+b.普通管理员：
+db.createUser(
+  {
+    user: "jyjin",
+    pwd: "123456",
+    roles: [ { role: "readWrite", db: "test" } ]
+  }
+)
+
+db.createUser({user: "jyjin", pwd: "123456", roles: [{role: "readWrite", db: "test"}]})
+
+c.创建游客：
+db.createUser(
+  {
+    user: "jyjinGuest",
+    pwd: "123456",
+    roles: [ { role: "read", db: "test" } ]
+  }
+)
+
+db.createUser({user: "jyjinGuest", pwd: "123456", roles: [{role: "read", db: "test"}]})
+
+创建时的角色说明：
+
+Read：允许用户读取指定数据库
+readWrite：允许用户读写指定数据库
+dbAdmin：允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile
+userAdmin：允许用户向system.users集合写入，可以找指定数据库里创建、删除和管理用户
+clusterAdmin：只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。
+readAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读权限
+readWriteAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读写权限
+userAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的userAdmin权限
+dbAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限。
+root：只在admin数据库中可用。超级账号，超级权限。
+ 
+集群管理角色：
+clusterAdmin：                  赋予管理集群的最高权限，只在admin数据库中可用
+clusterManager：               赋予管理和监控集群的权限
+clusterMonitor：                赋予监控集群的权限，对监控工具具有readonly的权限
+hostManager：                   赋予管理Server
+
+db.dropUser("user")# 删除用户
+
+db.system.users.find(); # 查看用户
+
 
