@@ -1,0 +1,33 @@
+1、获取资源
+访问官网https://www.mongodb.com/try/download/community下载
+或直接wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-4.4.0.tgz
+
+2、解压 tar -zxf mongodb-linux-x86_64-rhel70-4.4.0.tgz
+解压后改个名字 mv mongodb-linux-x86_64-rhel70-4.4.0 /你的路径/....
+
+3、MongoDB 的可执行文件位于 bin 目录下，所以可以将其添加到 PATH 路径中   ：export PATH=<mongodb-install-directory>/bin:$PATH
+比如我的安装目录是/home/mongodb，所以可以写成   export PATH=/home/mongodb/bin:$PATH
+
+4、创建数据库存放目录和日志
+MongoDB的数据存储在data目录的db目录下，但是这个目录在安装过程不会自动创建，所以你需要手动创建data目录，并在data目录中创建db存放目录
+mkdir data
+cd data
+mkdir db
+touch logs
+
+5、创建配置文件mongodb.conf
+touch mongodb.conf
+vi mongodb.conf    编辑mongodb.conf，按照实际情况复制下面的内容:
+
+dbpath = /opt/mongodb/data/db #数据文件存放目录  
+logpath =/opt/mongodb/data/logs #日志文件
+port = 27017 #端口 
+fork = true #以守护程序的方式启用，即在后台运行 
+#auth=true #验证用户名密码 ，这个暂时先不开放
+logappend=true 
+bind_ip=0.0.0.0 #这里默认是127.0.0.1, 设置成0.0.0.0是表示所有IP地址都可以访问(后面会具体介绍)
+
+这一步可以在启动mongodb服务前配置好，   ./mongod -f ../mongodb.conf  指定这个配置文件启动
+
+后台启动成功除非手动关掉mongo服务或者关机等意外，否则mongo服务一直是开启状态，关闭mongodb服务的方法：  bin下执行./mongo进入shell 执行db.shutdownServer();
+
