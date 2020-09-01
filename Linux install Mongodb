@@ -53,6 +53,8 @@ bindIp 127.0.0.1 => 直接mongo --port 27017 -u [USERNAME] -p [PASSWORD] ... 可
 bindIp 192.168.130.10p => 需要加--host mongo --port 27017 -u [USERNAME] -p [PASSWORD] --host 192.168.130.109 ..
 
 3.创建用户
+先选择数据库
+use yourdb
 a.系统管理员：
 db.createUser(
 {
