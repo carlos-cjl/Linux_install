@@ -49,3 +49,9 @@ python
 检验 pip 版本
 
 pip -V 
+
+
+
+添加用户到conda环境：
+切换到需要加入的用户
+conda init
