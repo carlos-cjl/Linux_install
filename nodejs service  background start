@@ -1,5 +1,4 @@
 一、利用 forever
-
 forever是一个nodejs守护进程，完全由命令行操控。forever会监控nodejs服务，并在服务挂掉后进行重启。
 
 1、安装 forever
