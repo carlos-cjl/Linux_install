@@ -23,7 +23,19 @@ forever restart index.js
 forever list
 
 二、pm2是一个进程管理工具,可以用它来管理你的node进程,并查看node进程的状态,当然也支持性能监控,进程守护,负载均衡等功能
-npm install -g pm2
+1.找到全局环境PATH路径
+输入命令： echo $PATH
+回车后：/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+路径可能不一样，但没关系，可以选择任何一个以：隔开的路径做为系统环境路径，通常会选/usr/local/bin
+
+2:找到pm2的安装路径
+输入 npm install pm2 -g全局安装时
+/usr/sbin/nodejs/bin/pm2 -> /usr/sbin/nodejs/lib/node_modules/pm2/bin/pm2
+/usr/sbin/nodejs/bin/pm2是安装路径（你的可能和我的不一样）
+
+3.格式：ln -s空格pm2安装路径空格系统环境路径
+命令为： ln -s /usr/sbin/nodejs/bin/pm2 /usr/local/bin/(注意空格)
+
 pm2 start app.js        // 启动
 pm2 start app.js -i max //启动 使用所有CPU核心的集群
 pm2 stop app.js         // 停止
