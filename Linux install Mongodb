@@ -6,8 +6,9 @@
 2、解压 tar -zxf mongodb-linux-x86_64-rhel70-4.4.0.tgz
 解压后改个名字 mv mongodb-linux-x86_64-rhel70-4.4.0 /你的路径/....
 
-3、MongoDB 的可执行文件位于 bin 目录下，所以可以将其添加到 PATH 路径中   ：export PATH=<mongodb-install-directory>/bin:$PATH
-比如我的安装目录是/home/mongodb，所以可以写成   export PATH=/home/mongodb/bin:$PATH
+3、MongoDB 的可执行文件位于 bin 目录下，所以可以将其添加到 PATH 路径中  vi /etc/profile ：export PATH=<mongodb-install-directory>/bin:$PATH
+比如我的安装目录是/home/mongodb，所以可以写成   
+export PATH=/home/mongodb/bin:$PATH
 
 4、创建数据库存放目录和日志
 MongoDB的数据存储在data目录的db目录下，但是这个目录在安装过程不会自动创建，所以你需要手动创建data目录，并在data目录中创建db存放目录
