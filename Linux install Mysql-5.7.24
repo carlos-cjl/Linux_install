@@ -1,63 +1,67 @@
+使用cepu账户登陆服务器
 一 安装前准备
 1、检查是否已经安装过mysql，执行命令
-[root@localhost /]# rpm -qa | grep mysql
-
-如果已经安装了mysql-libs-5.1.73-5.el6_6.x86_64，执行删除命令
-[root@localhost /]# rpm -e --nodeps mysql-libs-5.1.73-5.el6_6.x86_64
-
+rpm -qa | grep mysql
+rpm -e --nodeps mysql-libs-5.1.73-5.el6_6.x86_64等
 再次执行查询命令，查看是否删除
-[root@localhost /]# rpm -qa | grep mysql
+rpm -qa | grep mysql
 
 2、查询所有Mysql对应的文件夹
-[root@localhost /]# whereis mysql
-mysql: /usr/bin/mysql /usr/include/mysql
-[root@localhost lib]# find / -name mysql
-/data/mysql
-/data/mysql/mysql
+whereis mysql
+find / -name mysql
 删除相关目录或文件
-
-[root@localhost /]#  rm -rf /usr/bin/mysql /usr/include/mysql /data/mysql /data/mysql/mysql 
+rm -rf /usr/bin/mysql /usr/include/mysql /data/mysql /data/mysql/mysql 
 验证是否删除完毕
-
-[root@localhost /]# whereis mysql
-mysql:
-[root@localhost /]# find / -name mysql
-[root@localhost /]# 
-
-3、检查mysql用户组和用户是否存在，如果没有，则创建
-[root@localhost /]# cat /etc/group | grep mysql
-[root@localhost /]# cat /etc/passwd |grep mysql
-[root@localhost /]# groupadd mysql
-[root@localhost /]# useradd -r -g mysql mysql
-[root@localhost /]# 
-
-4、从官网下载是用于Linux的Mysql安装包
-下载命令：
-[root@localhost /]#  wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
-也可以直接到 mysql官网 选择对应版本进行下载。
-
+whereis mysql
+find / -name mysql
 
 二 安装Mysql
-1、在执行wget命令的目录下或你的上传目录下找到Mysql安装包：mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
-执行解压命令：
-[root@localhost /]#  tar xzvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
-[root@localhost /]# ls
-mysql-5.7.24-linux-glibc2.12-x86_64
-mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
+mkdir /home/cepu/mysql
+mkdir /home/cepu/mysql/data
+mkdir /home/cepu/mysql/logs
+cd /home/cepu/mysql
 
-解压完成后，可以看到当前目录下多了一个解压文件，移动该文件到/usr/local/下，并将文件夹名称修改为mysql。
-[root@localhost /]# mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/mysql
+添加配置文件
+vi my.cnf
 
-2、在/usr/local/mysql目录下创建data目录
-[root@localhost /]# mkdir /usr/local/mysql/data
+port=3306  
+socket=/home/cepu/mysql/mysql/mysql.sock  
+[mysqld]
+#服务端口号
+port=3306
+#mysql安装根目录
+basedir=/home/cepu/mysql/mysql
+#mysql数据文件所在位置
+datadir=/home/cepu/mysql/data
+#mysql进程文件
+pid-file=/home/cepu/mysql/mysql/mysql.pid
+#设置socke文件所在目录
+socket=/home/cepu/mysql/mysql/mysql.sock
+#数据库错误日志文件
+log_error=/home/cepu/mysql/logs/error.log
+server-id=100
+#数据库默认字符集,主流字符集支持一些特殊表情符号（特殊表情符占用4个字节
+character-set-server = utf8mb4
+#数据库字符集对应一些排序等规则，注意要和character-set-server对应
+collation-server = utf8mb4_general_ci
+#设置client连接mysql时的字符集,防止乱码
+init_connect='SET NAMES utf8mb4'
+#是否对sql语句大小写敏感，1表示不敏感
+lower_case_table_names = 1
+max_allowed_packet = 100M
+innodb_log_file_size=300M
+sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
 
-3、更改mysql目录下所有的目录及文件夹所属的用户组和用户，以及权限
-[root@localhost /]# chown -R mysql:mysql /usr/local/mysql
-[root@localhost /]# chmod -R 755 /usr/local/mysql
+解压压缩包
+tar xzvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
+mv mysql-5.7.24-linux-glibc2.12-x86_64 mysql
+cd /home/cepu/mysql/mysql/bin
+./mysqld --defaults-file=/home/cepu/mysql/my.cnf --initialize --user=cepu --basedir=/home/cepu/mysql/mysql--datadir=/home/cepu/mysql/data
 
-4、编译安装并初始化mysql,务必记住初始化输出日志末尾的密码（数据库管理员临时密码）
-[root@localhost /]# cd /usr/local/mysql/bin
-[root@localhost bin]# ./mysqld --initialize --user=mysql --datadir=/usr/local/mysql/data --basedir=/usr/local/mysql
+./mysqld_safe --defaults-file=/home/cepu/mysql/my.cnf --user=cepu &
+
+cat /home/cepu/mysql/mysql/logs/error.log 获取临时密码
+
 
 补充说明：
 第4步时，可能会出现错误：
