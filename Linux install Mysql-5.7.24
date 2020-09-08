@@ -1,4 +1,5 @@
 rpm -qa | grep mysql
+rpm -e mysql...
 whereis mysql
 find / -name mysql
 删除相关目录或文件
