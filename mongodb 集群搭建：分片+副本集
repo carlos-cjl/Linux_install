@@ -44,3 +44,50 @@ shard3：27003
 tar -xzvf mongodb-linux-x86_64-3.4.6.tgz -C /usr/local/
 #改名
 mv mongodb-linux-x86_64-3.4.6 mongodb
+
+分别在每台机器建立conf、mongos、config、shard1、shard2、shard3六个目录，因为mongos不存储数据，只需要建立日志文件目录即可。
+
+mkdir -p /home/cepu/mongodb/conf
+mkdir -p /home/cepu/mongodb/mongos/log
+mkdir -p /home/cepu/mongodb/config/data
+mkdir -p /home/cepu/mongodb/config/log
+mkdir -p /home/cepu/mongodb/shard1/data
+mkdir -p /home/cepu/mongodb/shard1/log
+mkdir -p /home/cepu/mongodb/shard2/data
+mkdir -p /home/cepu/mongodb/shard2/log
+mkdir -p /home/cepu/mongodb/shard3/data
+mkdir -p /home/cepu/mongodb/shard3/log
+
+配置环境变量
+
+vim /etc/profile
+# 内容
+export PATH=/home/cepu/mongodb/bin:$PATH
+# 使立即生效
+source /etc/profile
+
+2、config server配置服务器
+mongodb3.4以后要求配置服务器也创建副本集，不然集群搭建不成功。
+
+添加配置文件
+
+vi /home/cepu/mongodb/conf/config.conf
+
+## 配置文件内容
+pidfilepath = /home/cepu/mongodb/config/log/configsrv.pid
+dbpath = /home/cepu/mongodb/config/data
+logpath = /home/cepu/mongodb/config/log/congigsrv.log
+logappend = true
+ 
+bind_ip = 0.0.0.0
+port = 21000
+fork = true
+ 
+#declare this is a config db of a cluster;
+configsvr = true
+
+#副本集名称
+replSet=configs
+ 
+#设置最大连接数
+maxConns=20000
