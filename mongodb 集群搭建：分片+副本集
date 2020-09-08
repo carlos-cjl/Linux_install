@@ -23,12 +23,12 @@ replica set，中文翻译副本集，其实就是shard的备份，防止shard�
 
 服务器规划
  
-    服务器1	                       服务器2	                          服务器3
-    mongos	                        mongos	                         mongos
-  config server	                   config server	               config server
-shard server1 主节点	          shard server1 副节点	            shard server1 仲裁
-shard server2 仲裁	           shard server2 主节点	           shard server2 副节点
-shard server3 副节点	          shard server3 仲裁	             shard server3 主节点
+    服务器1	                       服务器2	                      服务器3
+    mongos	                        mongos	                      mongos
+  config server	                config server	                config server
+shard server1 主节点	         shard server1 副节点	          shard server1 仲裁
+shard server2 仲裁	           shard server2 主节点	          shard server2 副节点
+shard server3 副节点	         shard server3 仲裁	            shard server3 主节点
 
 
 mongos：20000
