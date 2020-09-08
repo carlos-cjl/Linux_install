@@ -46,7 +46,6 @@ tar -xzvf mongodb-linux-x86_64-3.4.6.tgz -C /usr/local/
 mv mongodb-linux-x86_64-3.4.6 mongodb
 
 分别在每台机器建立conf、mongos、config、shard1、shard2、shard3六个目录，因为mongos不存储数据，只需要建立日志文件目录即可。
-
 mkdir -p /home/cepu/mongodb/conf
 mkdir -p /home/cepu/mongodb/mongos/log
 mkdir -p /home/cepu/mongodb/config/data
@@ -59,7 +58,6 @@ mkdir -p /home/cepu/mongodb/shard3/data
 mkdir -p /home/cepu/mongodb/shard3/log
 
 配置环境变量
-
 vim /etc/profile
 # 内容
 export PATH=/home/cepu/mongodb/bin:$PATH
@@ -68,26 +66,40 @@ source /etc/profile
 
 2、config server配置服务器
 mongodb3.4以后要求配置服务器也创建副本集，不然集群搭建不成功。
-
-添加配置文件
-
-vi /home/cepu/mongodb/conf/config.conf
-
+添加配置文件  vi /home/cepu/mongodb/conf/config.conf
 ## 配置文件内容
 pidfilepath = /home/cepu/mongodb/config/log/configsrv.pid
 dbpath = /home/cepu/mongodb/config/data
 logpath = /home/cepu/mongodb/config/log/congigsrv.log
-logappend = true
- 
+logappend = true 
 bind_ip = 0.0.0.0
 port = 21000
 fork = true
- 
 #declare this is a config db of a cluster;
 configsvr = true
-
 #副本集名称
 replSet=configs
- 
 #设置最大连接数
 maxConns=20000
+
+
+启动三台服务器的config server
+mongod -f /home/cepu/mongodb/conf/config.conf
+
+登录任意一台配置服务器，初始化配置副本集
+
+#连接
+mongo --port 21000
+#config变量
+config = {
+...    _id : "configs",
+...     members : [
+...         {_id : 0, host : "192.168.0.139:21000" },
+...         {_id : 1, host : "192.168.0.141:21000" },
+...         {_id : 2, host : "192.168.0.143:21000" }
+...     ]
+... }
+
+#初始化副本集
+rs.initiate(config)
+其中，"_id" : "configs"应与配置文件中配置的 replicaction.replSetName 一致，"members" 中的 "host" 为三个节点的 ip 和 port
