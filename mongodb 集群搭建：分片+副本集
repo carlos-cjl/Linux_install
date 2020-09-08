@@ -100,6 +100,8 @@ config = {
 ...     ]
 ... }
 
-#初始化副本集
+#初始化副本集，需要等一会才有反应
 rs.initiate(config)
 其中，"_id" : "configs"应与配置文件中配置的 replicaction.replSetName 一致，"members" 中的 "host" 为三个节点的 ip 和 port
+
+
