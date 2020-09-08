@@ -29,3 +29,18 @@ replica set，中文翻译副本集，其实就是shard的备份，防止shard�
 shard server1 主节点	          shard server1 副节点	            shard server1 仲裁
 shard server2 仲裁	           shard server2 主节点	           shard server2 副节点
 shard server3 副节点	          shard server3 仲裁	             shard server3 主节点
+
+
+mongos：20000
+config：21000
+shard1：27001
+shard2：27002
+shard3：27003
+
+
+集群搭建
+1、安装mongodb
+#解压
+tar -xzvf mongodb-linux-x86_64-3.4.6.tgz -C /usr/local/
+#改名
+mv mongodb-linux-x86_64-3.4.6 mongodb
