@@ -60,7 +60,7 @@ cd /home/cepu/mysql/mysql/bin
 
 ./mysqld_safe --defaults-file=/home/cepu/mysql/my.cnf --user=cepu &
 
-cat /home/cepu/mysql/mysql/logs/error.log 获取临时密码
+cat /home/cepu/mysql/logs/error.log 获取临时密码
 
 
 补充说明：
