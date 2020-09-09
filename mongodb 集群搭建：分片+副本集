@@ -94,9 +94,9 @@ mongo --port 21000
 config = {
 ...    _id : "configs",
 ...     members : [
-...         {_id : 0, host : "192.168.0.139:21000" },
-...         {_id : 1, host : "192.168.0.141:21000" },
-...         {_id : 2, host : "192.168.0.143:21000" }
+...         {_id : 0, host : "192.168.1.139:21000" },
+...         {_id : 1, host : "192.168.1.141:21000" },
+...         {_id : 2, host : "192.168.1.143:21000" }
 ...     ]
 ... }
 #初始化副本集，需要等一会才有反应
@@ -127,4 +127,21 @@ shardsvr = true
 maxConns=20000
 
 保存后,启动三台服务器的shard1 server
-mongod -f /home/mongodb/conf/shard1.conf
+mongod -f /home/cepu/mongodb/conf/shard1.conf
+
+登陆任意一台服务器，初始化副本集
+mongo --port 27001
+#使用admin数据库
+use admin
+#定义副本集配置，第三个节点的 "arbiterOnly":true 代表其为仲裁节点。
+config = {
+...    _id : "shard1",
+...     members : [
+...         {_id : 0, host : "192.168.1.139:21001" },
+...         {_id : 1, host : "192.168.1.141:21001" },
+...         {_id : 2, host : "192.168.1.143:21001",arbiterOnly: true }
+...     ]
+... }
+
+#初始化副本集配置
+rs.initiate(config);
