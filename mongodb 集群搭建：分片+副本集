@@ -99,9 +99,32 @@ config = {
 ...         {_id : 2, host : "192.168.0.143:21000" }
 ...     ]
 ... }
-
 #初始化副本集，需要等一会才有反应
 rs.initiate(config)
 其中，"_id" : "configs"应与配置文件中配置的 replicaction.replSetName 一致，"members" 中的 "host" 为三个节点的 ip 和 port
 
+3、配置分片副本集(三台机器)
+设置第一个分片副本集
+配置文件
+vi /home/cepu/mongodb/conf/shard1.conf
 
+#配置文件内容
+pidfilepath = /home/cepu/mongodb/shard1/log/shard1.pid
+dbpath = /home/cepu/mongodb/shard1/data
+logpath = /home/cepu/mongodb/shard1/log/shard1.log
+logappend = true
+bind_ip = 0.0.0.0
+port = 27001
+fork = true 
+#打开web监控
+httpinterface=true
+rest=true 
+#副本集名称
+replSet=shard1
+#declare this is a shard db of a cluster;
+shardsvr = true 
+#设置最大连接数
+maxConns=20000
+
+保存后,启动三台服务器的shard1 server
+mongod -f /home/mongodb/conf/shard1.conf
