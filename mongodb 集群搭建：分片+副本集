@@ -117,8 +117,8 @@ bind_ip = 0.0.0.0
 port = 27001
 fork = true 
 #打开web监控
-httpinterface=true
-rest=true 
+#httpinterface=true
+#rest=true 
 #副本集名称
 replSet=shard1
 #declare this is a shard db of a cluster;
