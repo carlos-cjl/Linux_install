@@ -203,3 +203,19 @@ maxConns=20000
 
 启动三台服务器的shard3 server
 mongod -f /home/cepu/mongodb/conf/shard3.conf
+登陆任意一台服务器，初始化副本集
+mongo --port 27003
+#使用admin数据库
+use admin
+#定义副本集配置
+config = {
+...    _id : "shard3",
+...     members : [
+...         {_id : 0, host : "192.168.1.139:27003" },
+...         {_id : 1, host : "192.168.1.141:27003" , arbiterOnly: true},
+...         {_id : 2, host : "192.168.1.143:27003" }
+...     ]
+... }
+
+#初始化副本集配置
+rs.initiate(config);
