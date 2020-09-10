@@ -1,19 +1,14 @@
-mongos，数据库集群请求的入口，所有的请求都通过mongos进行协调，不需要在应用程序添加一个路由选择器，mongos自己就是一个请求分发中心，它负责把对应的数据请求请求转发到对应的shard服务器上。
+    mongos，数据库集群请求的入口，所有的请求都通过mongos进行协调，不需要在应用程序添加一个路由选择器，mongos自己就是一个请求分发中心，它负责把对应的数据请求请求转发到对应的shard服务器上。
 在生产环境通常有多mongos作为请求的入口，防止其中一个挂掉所有的mongodb请求都没有办法操作。
-
-config server，顾名思义为配置服务器，存储所有数据库元信息（路由、分片）的配置。mongos本身没有物理存储分片服务器和数据路由信息，只是缓存在内存里，配置服务器则实际存储这些数据。
+    config server，顾名思义为配置服务器，存储所有数据库元信息（路由、分片）的配置。mongos本身没有物理存储分片服务器和数据路由信息，只是缓存在内存里，配置服务器则实际存储这些数据。
 mongos第一次启动或者关掉重启就会从 config server 加载配置信息，以后如果配置服务器信息变化会通知到所有的 mongos 更新自己的状态，这样 mongos 就能继续准确路由。
 在生产环境通常有多个 config server 配置服务器，因为它存储了分片路由的元数据，防止数据丢失！
-
-shard，分片（sharding）是指将数据库拆分，将其分散在不同的机器上的过程。将数据分散到不同的机器上，不需要功能强大的服务器就可以存储更多的数据和处理更大的负载。
+    shard，分片（sharding）是指将数据库拆分，将其分散在不同的机器上的过程。将数据分散到不同的机器上，不需要功能强大的服务器就可以存储更多的数据和处理更大的负载。
 基本思想就是将集合切成小块，这些块分散到若干片里，每个片只负责总数据的一部分，最后通过一个均衡器来对各个分片进行均衡（数据迁移）。
-
-replica set，中文翻译副本集，其实就是shard的备份，防止shard挂掉之后数据丢失。复制提供了数据的冗余备份，并在多个服务器上存储数据副本，提高了数据的可用性， 并可以保证数据的安全性。
-
-仲裁者（Arbiter），是复制集中的一个MongoDB实例，它并不保存数据。仲裁节点使用最小的资源并且不要求硬件设备，不能将Arbiter部署在同一个数据集节点中，可以部署在其他应用服务器或者监视服务器中，
+    replica set，中文翻译副本集，其实就是shard的备份，防止shard挂掉之后数据丢失。复制提供了数据的冗余备份，并在多个服务器上存储数据副本，提高了数据的可用性， 并可以保证数据的安全性。
+    仲裁者（Arbiter），是复制集中的一个MongoDB实例，它并不保存数据。仲裁节点使用最小的资源并且不要求硬件设备，不能将Arbiter部署在同一个数据集节点中，可以部署在其他应用服务器或者监视服务器中，
 也可部署在单独的虚拟机中。为了确保复制集中有奇数的投票成员（包括primary），需要添加仲裁节点做为投票，否则primary不能运行时不会自动切换primary。
-
-简单了解之后，我们可以这样总结一下，应用请求mongos来操作mongodb的增删改查，配置服务器存储数据库元信息，并且和mongos做同步，数据最终存入在shard（分片）上，
+    简单了解之后，我们可以这样总结一下，应用请求mongos来操作mongodb的增删改查，配置服务器存储数据库元信息，并且和mongos做同步，数据最终存入在shard（分片）上，
 为了防止数据丢失同步在副本集中存储了一份，仲裁在数据存储到分片的时候决定存储到哪个节点。
 
 环境准备
@@ -22,7 +17,6 @@ replica set，中文翻译副本集，其实就是shard的备份，防止shard�
 安装包： mongodb-linux-x86_64-3.4.6.tgz
 
 服务器规划
- 
     服务器1	                       服务器2	                      服务器3
     mongos	                        mongos	                      mongos
   config server	                config server	                config server
@@ -38,12 +32,12 @@ shard2：27002
 shard3：27003
 
 
+
+
 集群搭建
 1、安装mongodb
-#解压
-tar -xzvf mongodb-linux-x86_64-3.4.6.tgz -C /usr/local/
-#改名
-mv mongodb-linux-x86_64-3.4.6 mongodb
+#解压 tar -xzvf mongodb-linux-x86_64-3.4.6.tgz -C /usr/local/
+#改名  mv mongodb-linux-x86_64-3.4.6 mongodb
 
 分别在每台机器建立conf、mongos、config、shard1、shard2、shard3六个目录，因为mongos不存储数据，只需要建立日志文件目录即可。
 mkdir -p /home/cepu/mongodb/conf
@@ -59,10 +53,11 @@ mkdir -p /home/cepu/mongodb/shard3/log
 
 配置环境变量
 vim /etc/profile
-# 内容
-export PATH=/home/cepu/mongodb/bin:$PATH
-# 使立即生效
-source /etc/profile
+# 内容  export PATH=/home/cepu/mongodb/bin:$PATH
+# 使立即生效  source /etc/profile
+
+
+
 
 2、config server配置服务器
 mongodb3.4以后要求配置服务器也创建副本集，不然集群搭建不成功。
@@ -85,11 +80,8 @@ maxConns=20000
 
 启动三台服务器的config server
 mongod -f /home/cepu/mongodb/conf/config.conf
-
 登录任意一台配置服务器，初始化配置副本集
-
-#连接
-mongo --port 21000
+#连接  mongo --port 21000
 #config变量
 config = {
 ...    _id : "configs",
@@ -103,11 +95,12 @@ config = {
 rs.initiate(config)
 其中，"_id" : "configs"应与配置文件中配置的 replicaction.replSetName 一致，"members" 中的 "host" 为三个节点的 ip 和 port
 
+
+
+
 3、配置分片副本集(三台机器)
 设置第一个分片副本集
-配置文件
-vi /home/cepu/mongodb/conf/shard1.conf
-
+配置文件  vi /home/cepu/mongodb/conf/shard1.conf
 #配置文件内容
 pidfilepath = /home/cepu/mongodb/shard1/log/shard1.pid
 dbpath = /home/cepu/mongodb/shard1/data
@@ -128,7 +121,6 @@ maxConns=20000
 
 保存后,启动三台服务器的shard1 server
 mongod -f /home/cepu/mongodb/conf/shard1.conf
-
 登陆任意一台服务器，初始化副本集
 mongo --port 27001
 #使用admin数据库
@@ -147,16 +139,14 @@ config = {
 rs.initiate(config);
 
 
+
 设置第二个分片副本集
-配置文件
-vi /home/cepu/mongodb/conf/shard1.conf
-
+配置文件   vi /home/cepu/mongodb/conf/shard2.conf
 #配置文件内容
-pidfilepath = /usr/local/mongodb/shard2/log/shard2.pid
-dbpath = /usr/local/mongodb/shard2/data
-logpath = /usr/local/mongodb/shard2/log/shard2.log
+pidfilepath = /home/cepu/mongodb/shard2/log/shard2.pid
+dbpath = /home/cepu/mongodb/shard2/data
+logpath = /home/cepu/mongodb/shard2/log/shard2.log
 logappend = true
-
 bind_ip = 0.0.0.0
 port = 27002
 fork = true
@@ -169,3 +159,47 @@ replSet=shard2
 shardsvr = true
 #设置最大连接数
 maxConns=20000
+
+启动三台服务器的shard2 server
+mongod -f /home/cepu/mongodb/conf/shard2.conf 
+登陆任意一台服务器，初始化副本集
+mongo --port 27002
+#使用admin数据库
+use admin
+#定义副本集配置
+config = {
+...    _id : "shard2",
+...     members : [
+...         {_id : 0, host : "192.168.1.139:27002"  , arbiterOnly: true },
+...         {_id : 1, host : "192.168.1.141:27002" },
+...         {_id : 2, host : "192.168.1.143:27002" }
+...     ]
+... }
+
+#初始化副本集配置
+rs.initiate(config);
+
+
+
+设置第三个分片副本集
+配置文件 vi /home/cepu/mongodb/conf/shard3.conf
+#配置文件内容
+pidfilepath = /home/cepu/mongodb/shard3/log/shard3.pid
+dbpath = /home/cepu/mongodb/shard3/data
+logpath = /home/cepu/mongodb/shard3/log/shard3.log
+logappend = true
+bind_ip = 0.0.0.0
+port = 27003
+fork = true 
+#打开web监控
+#httpinterface=true
+#rest=true 
+#副本集名称
+replSet=shard3 
+#declare this is a shard db of a cluster;
+shardsvr = true
+#设置最大连接数
+maxConns=20000
+
+启动三台服务器的shard3 server
+mongod -f /home/cepu/mongodb/conf/shard3.conf
