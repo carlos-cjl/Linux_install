@@ -260,3 +260,53 @@ db.runCommand( { shardcollection : "testdb.table1",key : {id: 1} } )
 我们设置testdb的 table1 表需要分片，根据 id 自动分片到 shard1 ，shard2，shard3 上面去。要这样设置是因为不是所有mongodb 的数据库和表 都需要分片！
 测试分片配置结果
 
+mongo  127.0.0.1:20000
+#使用testdb
+use  testdb;
+#插入测试数据
+for (var i = 1; i <= 100000; i++)
+db.table1.save({id:i,"test1":"testval1"});
+#查看分片情况如下，部分无关信息省掉了
+db.table1.stats();
+
+{
+        "sharded" : true,
+        "ns" : "testdb.table1",
+        "count" : 100000,
+        "numExtents" : 13,
+        "size" : 5600000,
+        "storageSize" : 22372352,
+        "totalIndexSize" : 6213760,
+        "indexSizes" : {
+                "_id_" : 3335808,
+                "id_1" : 2877952
+        },
+        "avgObjSize" : 56,
+        "nindexes" : 2,
+        "nchunks" : 3,
+        "shards" : {
+                "shard1" : {
+                        "ns" : "testdb.table1",
+                        "count" : 42183,
+                        "size" : 0,
+                        ...
+                        "ok" : 1
+                },
+                "shard2" : {
+                        "ns" : "testdb.table1",
+                        "count" : 38937,
+                        "size" : 2180472,
+                        ...
+                        "ok" : 1
+                },
+                "shard3" : {
+                        "ns" : "testdb.table1",
+                        "count" :18880,
+                        "size" : 3419528,
+                        ...
+                        "ok" : 1
+                }
+        },
+        "ok" : 1
+}
+可以看到数据分到3个分片，各自分片数量为： shard1 “count” : 42183，shard2 “count” : 38937，shard3 “count” : 18880。已经成功了！
