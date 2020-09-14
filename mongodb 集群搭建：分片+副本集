@@ -250,3 +250,13 @@ sh.addShard("shard2/192.168.1.139:27002,192.168.1.141:27002,192.168.1.143:27002"
 sh.addShard("shard3/192.168.1.139:27003,192.168.1.141:27003,192.168.1.143:27003")
 #查看集群状态
 sh.status()
+
+6、测试
+目前配置服务、路由服务、分片服务、副本集服务都已经串联起来了，但我们的目的是希望插入数据，数据能够自动分片。连接在mongos上，准备让指定的数据库、指定的集合分片生效。
+#指定testdb分片生效
+db.runCommand( { enablesharding :"testdb"});
+#指定数据库里需要分片的集合和片键
+db.runCommand( { shardcollection : "testdb.table1",key : {id: 1} } )
+我们设置testdb的 table1 表需要分片，根据 id 自动分片到 shard1 ，shard2，shard3 上面去。要这样设置是因为不是所有mongodb 的数据库和表 都需要分片！
+测试分片配置结果
+
