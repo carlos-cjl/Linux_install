@@ -60,6 +60,8 @@ mysql>flush privileges;
 
 
 
+
+
 添加配置文件
 vi my.cnf
 
@@ -91,14 +93,9 @@ max_allowed_packet = 100M
 innodb_log_file_size=300M
 sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
 
-解压压缩包
-tar xzvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
-mv mysql-5.7.24-linux-glibc2.12-x86_64 mysql
-cd /home/cepu/mysql/mysql/bin
+
 ./mysqld --defaults-file=/home/cepu/mysql/my.cnf --initialize --user=cepu --basedir=/home/cepu/mysql/mysql --datadir=/home/cepu/mysql/data
-
 ./mysqld_safe --defaults-file=/home/cepu/mysql/my.cnf --user=cepu &
-
 cat /home/cepu/mysql/logs/error.log 获取临时密码
 
 
