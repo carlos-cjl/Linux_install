@@ -1,14 +1,28 @@
+检查是否已安装过mariadb，和mysql若有便删除（linux系统自带的）
 rpm -qa | grep mysql
 rpm -e --nodeps mysql...
+rpm -qa | grep mariadb
+rpm -e --nodeps mysql...
+
 whereis mysql
 find / -name mysql
 删除相关目录或文件
 
 二 安装Mysql
-mkdir /home/cepu/mysql
-mkdir /home/cepu/mysql/data
-mkdir /home/cepu/mysql/logs
-cd /home/cepu/mysql
+tar xzvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
+mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/mysql
+cd /usr/local/ 
+chown -R mysql:mysql mysql/
+chmod -R 755 mysql/
+/usr/local/mysql/bin/mysqld --initialize --user=mysql --datadir=/usr/local/mysql/data --basedir=/usr/local/mysql
+运行初始化命令成功后，输出日志如下：
+2020-08-14T06:25:04.457048Z 0 [Warning] TIMESTAMP with implicit DEFAULT value is deprecated. Please use --explicit_defaults_for_timestamp server option (see documentation for more details).
+2020-08-14T06:25:04.602219Z 0 [Warning] InnoDB: New log files created, LSN=45790
+2020-08-14T06:25:04.639620Z 0 [Warning] InnoDB: Creating foreign key constraint system tables.
+2020-08-14T06:25:04.698852Z 0 [Warning] No existing UUID has been found, so we assume that this is the first time that this server has been started. Generating a new UUID: e41c82a1-ddf6-11ea-b7df-fa163eaee30f.
+2020-08-14T06:25:04.700674Z 0 [Warning] Gtid table is not ready to be used. Table 'mysql.gtid_executed' cannot be opened.
+2020-08-14T06:25:04.701089Z 1 [Note] A temporary password is generated for root@localhost: DzUdau;3tHb*
+记录日志最末尾位置root@localhost:后的字符串，此字符串为mysql管理员临时登录密码。
 
 添加配置文件
 vi my.cnf
@@ -66,6 +80,14 @@ yum -y install numactl
 2020-08-14T06:25:04.701089Z 1 [Note] A temporary password is generated for root@localhost: DzUdau;3tHb*
 记录日志最末尾位置root@localhost:后的字符串，此字符串为mysql管理员临时登录密码。
 
+ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql 
+ln -s /usr/local/mysql/bin/mysql /usr/bin/mysql
+
+
+
+
+
+
 异常情况，如果出现如下提示信息
 Starting MySQL... ERROR! The server quit without updating PID file
 查看是否存在mysql和mysqld的服务，如果存在，则结束进程，再重新执行启动命令
@@ -81,8 +103,8 @@ kill -9 PID
  /usr/local/mysql/support-files/mysql.server start
 
 8、添加软连接，并重启mysql服务
-[root@localhost /]#  ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql 
-[root@localhost /]#  ln -s /usr/local/mysql/bin/mysql /usr/bin/mysql
+ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql 
+ln -s /usr/local/mysql/bin/mysql /usr/bin/mysql
 [root@localhost /]#  service mysql restart
 
 9、登录mysql，修改密码(密码为步骤5生成的临时密码)
