@@ -12,3 +12,4 @@ cluster.initial_master_nodes: ["node-1"]
 cd ../bin/
 nohup ./elasticsearch &
 #$ nohup: 忽略输入并把输出追加到"nohup.out",后台启动shell脚本
+  
